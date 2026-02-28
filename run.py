@@ -70,15 +70,21 @@ class Run_Main():
                     print("币种:{coin}当前市价：{market_price}。未能满足交易,继续运行".format(market_price = cur_market_price,coin=coinType))
                     time.sleep(1)
 
-#if __name__ == "__main__":
-#    instance = Run_Main()
-#    try:
-#        instance.loop_run()
-#    except Exception as e:
-#        error_info = "报警：做多网格,服务停止"
-#        msg.dingding_warn(error_info)
+if __name__ == "__main__":
+   instance = Run_Main()
+   try:
+       instance.loop_run()
+   except Exception as e:
+       if hasattr(e, 'code') and e.code == -2010:
+           error_info += f"余额不足"
+           msg.dingding_warn(error_info)
+           pass  # 跳过当前交易，继续运行
+       else:
+           error_info = "报警：做多网格,服务停止"
+           msg.dingding_warn(error_info)
+           raise  # 重新抛出异常，停止服务
 
 # 调试看报错运行下面，正式运行用上面       
-if __name__ == "__main__":
-    instance = Run_Main()
-    instance.loop_run()
+# if __name__ == "__main__":
+#     instance = Run_Main()
+#     instance.loop_run()
