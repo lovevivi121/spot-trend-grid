@@ -72,17 +72,19 @@ class Run_Main():
 
 if __name__ == "__main__":
    instance = Run_Main()
-   try:
-       instance.loop_run()
-   except Exception as e:
-       if hasattr(e, 'code') and e.code == -2010:
-           error_info += f"余额不足"
-           msg.dingding_warn(error_info)
-           pass  # 跳过当前交易，继续运行
-       else:
-           error_info = "报警：做多网格,服务停止"
-           msg.dingding_warn(error_info)
-           raise  # 重新抛出异常，停止服务
+   while True:
+       try:
+           instance.loop_run()
+       except Exception as e:
+           if hasattr(e, 'code') and (e.code == -2010 or e.code == -1013):
+               error_info = f"余额不足，等待2分钟后重试"
+               msg.dingding_warn(error_info)
+               time.sleep(60*2)  # 等待2分钟后继续运行
+               continue  # 继续循环，重新开始运行
+           else:
+               error_info = "报警：做多网格,服务停止"
+               msg.dingding_warn(error_info)
+               raise  # 重新抛出异常，停止服务
 
 # 调试看报错运行下面，正式运行用上面       
 # if __name__ == "__main__":
